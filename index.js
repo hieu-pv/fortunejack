@@ -14,8 +14,7 @@ const pi = "31415926535897932384626433832795028841971693993751058209749445923078
 const pi_length = pi.length;
 let pi_index = Math.round(Math.random() * pi_length) - 1;
 
-const dice = async () => {
-  let driver = await new Builder().forBrowser("chrome").build();
+const dice = async driver => {
   await Login(process.env.EMAIL, process.env.PASSWORD, driver);
   try {
     let amount = _.clone(base_amount);
@@ -32,7 +31,8 @@ const dice = async () => {
       await driver.sleep(2000);
     }
 
-    while (true) {
+    let time = 0;
+    while (time < process.env.MAX_ROUND) {
       console.log(`Start ${moment().format("h:mm:ss")} | Bet Amount: ${amount}`);
       while (true) {
         let v = await driver.findElement(By.css(process.env.BET_AMOUNT_SELECTOR)).getAttribute("value");
@@ -73,15 +73,19 @@ const dice = async () => {
         amount = _.clone(base_amount);
         console.log(`----Win, Amount: ${wallet_ammount}----`.green);
       }
-      // let profit_amount = await driver.findElement(By.css(process.env.PROFIT_AMOUNT_SELECTOR)).getText();
-      // if (Number(profit_amount) > Number(process.env.RESET_WHEN_PROFIT_MORE_THAN)) {
-      //   break;
-      // }
-      // dice();
+      if (++time === 5) {
+        break;
+      }
     }
   } finally {
     // await driver.quit();
   }
 };
 
-dice();
+(async function r() {
+  while (true) {
+    let driver = await new Builder().forBrowser("chrome").build();
+    await dice(driver);
+    driver.quit();
+  }
+})();
