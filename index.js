@@ -32,7 +32,7 @@ const dice = async driver => {
     }
 
     let time = 0;
-    while (time < Number(process.env.MAX_ROUND)) {
+    while (true) {
       console.log(`Start ${moment().format("h:mm:ss")} | Bet Amount: ${amount}`);
       while (true) {
         let v = await driver.findElement(By.css(process.env.BET_AMOUNT_SELECTOR)).getAttribute("value");
@@ -73,7 +73,7 @@ const dice = async driver => {
         amount = _.clone(base_amount);
         console.log(`----Win, Amount: ${wallet_ammount}----`.green);
       }
-      if (++time === 5) {
+      if (++time <= Number(process.env.MAX_ROUND)) {
         break;
       }
     }
