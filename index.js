@@ -73,7 +73,7 @@ const dice = async driver => {
         amount = _.clone(base_amount);
         console.log(`----Win, Amount: ${wallet_ammount}----`.green);
       }
-      if (++time <= Number(process.env.MAX_ROUND)) {
+      if (++time >= Number(process.env.MAX_ROUND)) {
         break;
       }
     }
