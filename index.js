@@ -64,6 +64,13 @@ const dice = async driver => {
           return true;
         }
       });
+
+      if (value === "Something happened, did not receive reply in 10 seconds, try again or refresh the page") {
+        await driver.get(process.env.GAME_URL);
+        time = 0;
+        await driver.sleep(5000);
+      }
+
       let classes = await driver.findElement(By.css(process.env.RESULT_BAR_SELECTOR)).getAttribute("class");
       let is_win = classes.indexOf("win") > -1;
       let wallet_ammount = await driver.findElement(By.css(process.env.WALLET_AMOUNT_SELECTOR)).getText();
