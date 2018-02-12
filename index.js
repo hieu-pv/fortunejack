@@ -49,7 +49,7 @@ const dice = async driver => {
       }
       // if (Number(pi.charAt(pi_index++)) % 2 === 1) {
       if (bit_high_value) {
-        console.log("-------- Hight");
+        console.log("-------- High");
         await driver.findElement(By.css(process.env.HIGH_ROLL_SELECTOR)).click();
       } else {
         console.log("-------- Low");
