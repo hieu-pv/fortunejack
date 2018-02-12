@@ -65,13 +65,14 @@ const dice = async driver => {
       let classes = await driver.findElement(By.css(process.env.RESULT_BAR_SELECTOR)).getAttribute("class");
       let is_win = classes.indexOf("win") > -1;
       let wallet_ammount = await driver.findElement(By.css(process.env.WALLET_AMOUNT_SELECTOR)).getText();
-      if (!is_win && ++lose === Number(process.env.MAX_LOSE_TIME)) {
-        amount = 2 * amount;
-        console.log(`----Lose(${lose} times), Amount: ${wallet_ammount}----`.red);
-      } else {
+      if (is_win || lose === Number(process.env.MAX_LOSE_TIME) - 1) {
         lose = 0;
         amount = _.clone(base_amount);
         console.log(`----Win, Amount: ${wallet_ammount}----`.green);
+      } else {
+        lose++;
+        amount = 2 * amount;
+        console.log(`----Lose(${lose} times), Amount: ${wallet_ammount}----`.red);
       }
       if (++time >= Number(process.env.MAX_ROUND)) {
         break;
