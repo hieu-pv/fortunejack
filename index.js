@@ -13,6 +13,7 @@ let lose = 0;
 const pi = "31415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679821480865132823066470938446095505822317253594081284811174502841027019385211055596446229489549303819644288109756659334461284756482337867831652712019091456485669234603486104543266482133936072602491412737245870066063155881748815209209628292540917153643678925903600113305305488204665213841469519415116094330572703657595919530921861173819326117931051185480744623799627495673518857527248912279381830119491298336733624406566430860213949463952247371907021798609437027705392171762931767523846748184";
 const pi_length = pi.length;
 let pi_index = Math.round(Math.random() * pi_length) - 1;
+let bit_high_value = true;
 
 const dice = async driver => {
   await Login(process.env.EMAIL, process.env.PASSWORD, driver);
@@ -46,7 +47,8 @@ const dice = async driver => {
       if (pi_index >= pi_length - 1) {
         pi_index = 0;
       }
-      if (Number(pi.charAt(pi_index++)) % 2 === 1) {
+      // if (Number(pi.charAt(pi_index++)) % 2 === 1) {
+      if (bit_high_value) {
         console.log("-------- Hight");
         await driver.findElement(By.css(process.env.HIGH_ROLL_SELECTOR)).click();
       } else {
@@ -75,7 +77,10 @@ const dice = async driver => {
         console.log(`----Lose(${lose} times), Amount: ${wallet_ammount}----`.red);
       }
       if (++time >= Number(process.env.MAX_ROUND)) {
-        break;
+        bit_high_value = !bit_high_value;
+        await driver.get(process.env.GAME_URL);
+        time = 0;
+        await driver.sleep(5000);
       }
     }
   } finally {
