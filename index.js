@@ -48,7 +48,7 @@ const dice = async driver => {
         pi_index = 0;
       }
       if (Number(pi.charAt(pi_index++)) % 2 === 1) {
-      // if (bit_high_value) {
+        // if (bit_high_value) {
         console.log("-------- Hight");
         await driver.findElement(By.css(process.env.HIGH_ROLL_SELECTOR)).click();
       } else {
@@ -58,18 +58,18 @@ const dice = async driver => {
 
       await driver.wait(async () => {
         let value = await driver.findElement(By.css(process.env.RESULT_BAR_SELECTOR)).getText();
+        if (value === "Something happened, did not receive reply in 10 seconds, try again or refresh the page") {
+          await driver.get(process.env.GAME_URL);
+          time = 0;
+          await driver.sleep(5000);
+          return true;
+        }
         if (value !== old_value) {
           old_value = _.clone(value);
           console.log(`-------- ${value}`);
           return true;
         }
       });
-
-      if (value === "Something happened, did not receive reply in 10 seconds, try again or refresh the page") {
-        await driver.get(process.env.GAME_URL);
-        time = 0;
-        await driver.sleep(5000);
-      }
 
       let classes = await driver.findElement(By.css(process.env.RESULT_BAR_SELECTOR)).getAttribute("class");
       let is_win = classes.indexOf("win") > -1;
