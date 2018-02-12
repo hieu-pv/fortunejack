@@ -32,6 +32,16 @@ const dice = async driver => {
       await driver.sleep(2000);
     }
 
+    if (process.env.AUTO_CACULATE_GOOD_BET_AMOUNT === "true") {
+      let balance = await driver.findElement(By.css(process.env.WALLET_AMOUNT_SELECTOR)).getText();
+      if (curren_currency_classes.indexOf("btc") > -1) {
+        base_amount = Math.round(Number(_.head(balance.split(" ")) * 100000000 / 2000)) / 100000000;
+      } else {
+        base_amount = Math.round(Number(_.head(balance.split(" ")) / 2000));
+      }
+      amount = _.clone(base_amount);
+    }
+
     let time = 0;
     while (true) {
       console.log(`Start ${moment().format("h:mm:ss")} | Bet Amount: ${amount}`);
@@ -88,6 +98,16 @@ const dice = async driver => {
         await driver.get(process.env.GAME_URL);
         time = 0;
         await driver.sleep(5000);
+        if (process.env.AUTO_CACULATE_GOOD_BET_AMOUNT === "true") {
+          let balance = await driver.findElement(By.css(process.env.WALLET_AMOUNT_SELECTOR)).getText();
+          if (curren_currency_classes.indexOf("btc") > -1) {
+            base_amount = Math.round(Number(_.head(balance.split(" ")) * 100000000 / 2000)) / 100000000;
+          } else {
+            base_amount = Math.round(Number(_.head(balance.split(" ")) / 2000));
+          }
+          amount = _.clone(base_amount);
+        }
+        await driver.sleep(1000);
       }
     }
   } finally {
