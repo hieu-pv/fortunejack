@@ -139,7 +139,7 @@ const dice = async driver => {
 
 (async function r() {
   while (true) {
-    let driver = await new Builder().forBrowser("chrome").build();
+    let driver = await new Builder().forBrowser(process.env.WEB_DRIVER).build();
     await dice(driver);
     driver.quit();
   }
