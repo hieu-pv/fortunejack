@@ -107,8 +107,9 @@ const dice = async driver => {
         console.log(`----Win, Amount: ${wallet_ammount}----`.green);
       } else {
         lose++;
-        if (lose > 3 && moment().diff(start_lose_time, 'seconds') > 3) {
+        if (lose > 4 && moment().diff(start_lose_time, 'seconds') > 3) { // change max time allowed of a lose seri
           amount = _.clone(base_amount);
+          start_lose_time = moment();
         } else {
           amount = 2 * amount;
         }
