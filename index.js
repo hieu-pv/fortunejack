@@ -13,7 +13,15 @@ let lose = 0;
 const pi = "31415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679821480865132823066470938446095505822317253594081284811174502841027019385211055596446229489549303819644288109756659334461284756482337867831652712019091456485669234603486104543266482133936072602491412737245870066063155881748815209209628292540917153643678925903600113305305488204665213841469519415116094330572703657595919530921861173819326117931051185480744623799627495673518857527248912279381830119491298336733624406566430860213949463952247371907021798609437027705392171762931767523846748184";
 const pi_length = pi.length;
 let pi_index = Math.round(Math.random() * pi_length) - 1;
+
+let start_lose_time = moment();
+
 let bit_high_value = true;
+if (process.env.ALGORITHM === 'high') {
+  bit_high_value = true;
+} else {
+  bit_high_value = false;
+}
 
 const dice = async driver => {
   await Login(process.env.EMAIL, process.env.PASSWORD, driver);
@@ -57,7 +65,14 @@ const dice = async driver => {
       if (pi_index >= pi_length - 1) {
         pi_index = 0;
       }
-      // if (Number(pi.charAt(pi_index++)) % 2 === 1) {
+      if (process.env.ALGORITHM === 'random') {
+        if (Number(pi.charAt(pi_index++)) % 2 === 1) {
+          bit_high_value = true;
+        } else {
+          bit_high_value = false;
+        }
+      }
+
       if (bit_high_value) {
         console.log("-------- High");
         await driver.findElement(By.css(process.env.HIGH_ROLL_SELECTOR)).click();
@@ -65,6 +80,7 @@ const dice = async driver => {
         console.log("-------- Low");
         await driver.findElement(By.css(process.env.LOW_ROLL_SELECTOR)).click();
       }
+
 
       await driver.wait(async () => {
         let value = await driver.findElement(By.css(process.env.RESULT_BAR_SELECTOR)).getText();
@@ -86,11 +102,16 @@ const dice = async driver => {
       let wallet_ammount = await driver.findElement(By.css(process.env.WALLET_AMOUNT_SELECTOR)).getText();
       if (is_win || lose === Number(process.env.MAX_LOSE_TIME) - 1) {
         lose = 0;
+        start_lose_time = moment();
         amount = _.clone(base_amount);
         console.log(`----Win, Amount: ${wallet_ammount}----`.green);
       } else {
         lose++;
-        amount = 2 * amount;
+        if (lose > 3 && moment().diff(start_lose_time, 'seconds') > 3) {
+          amount = _.clone(base_amount);
+        } else {
+          amount = 2 * amount;
+        }
         console.log(`----Lose(${lose} times), Amount: ${wallet_ammount}----`.red);
       }
       if (++time >= Number(process.env.MAX_ROUND)) {
