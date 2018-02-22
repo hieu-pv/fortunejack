@@ -74,12 +74,13 @@ const dice = async driver => {
 
   await driver.findElement(By.id(myBetsTabId)).click();
 
-  await driver.findElement(By.id(switchCurrencyId)).click();
+  if (Coin.name != "BTC") {
+    await driver.findElement(By.id(switchCurrencyId)).click();
 
-  await driver.wait(until.elementLocated(By.id(`dice_btn_${CoinId}`)), 2000);
+    await driver.wait(until.elementLocated(By.id(`dice_btn_${CoinId}`)), 2000);
 
-  await driver.findElement(By.id(`dice_btn_${CoinId}`)).click();
-
+    await driver.findElement(By.id(`dice_btn_${CoinId}`)).click();
+  }
   await driver.wait(() => {
     return driver
       .findElement(By.id(preloadBackdropId))
@@ -90,15 +91,15 @@ const dice = async driver => {
   console.log("Start game");
 
   let amount = _.clone(base_amount);
-  // if (process.env.AUTO_CACULATE_GOOD_BET_AMOUNT === "true") {
-  //   let balance = await driver.findElement(By.id(balanceId)).getText();
-  //   if (Coin.name === "BTC") {
-  //     base_amount = Math.round(Number(_.head(balance) * 100000000 / 2000)) / 100000000;
-  //   } else {
-  //     base_amount = Math.round(Number(_.head(balance) / 2000));
-  //   }
-  //   amount = _.clone(base_amount);
-  // }
+  if (process.env.AUTO_CACULATE_GOOD_BET_AMOUNT === "true") {
+    let balance = await driver.findElement(By.id(balanceId)).getText();
+    if (Coin.name === "BTC") {
+      base_amount = Math.round(Number(_.head(balance) * 100000000 / 2000)) / 100000000;
+    } else {
+      base_amount = Math.round(Number(_.head(balance) / 2000));
+    }
+    amount = _.clone(base_amount);
+  }
 
   let time = 0;
   while (true) {
@@ -163,6 +164,8 @@ const dice = async driver => {
 
     let last_dice_color = await driver.findElement(By.css("#dice_list_holder .dice_list_line_p_act .dice_list_line > span:last-child")).getCssValue("color");
     let rolledValue = await driver.findElement(By.css("#dice_list_holder .dice_list_line_p_act .dice_list_line > span.dice_list_roll > span")).getText();
+
+    console.log(`----Rolled: ${rolledValue}`);
 
     let is_win = last_dice_color === "rgba(13, 110, 52, 1)";
 
