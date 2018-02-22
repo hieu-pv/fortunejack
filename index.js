@@ -13,6 +13,9 @@ let CoinId;
 let base_amount = Number(process.env.BASE_AMOUNT);
 let old_value;
 let lose = 0;
+let total_win = 0;
+let total_lose = 0;
+let total_reset = 0;
 
 const balanceUsernameId = "balanceUsername";
 const balanceId = "_dice_bal_txt";
@@ -165,25 +168,36 @@ const dice = async driver => {
     let last_dice_color = await driver.findElement(By.css("#dice_list_holder .dice_list_line_p_act .dice_list_line > span:last-child")).getCssValue("color");
     let rolledValue = await driver.findElement(By.css("#dice_list_holder .dice_list_line_p_act .dice_list_line > span.dice_list_roll > span")).getText();
 
-    console.log(`----Rolled: ${rolledValue}`);
+    console.log(`-------- Rolled: ${rolledValue}`);
 
     let is_win = last_dice_color === "rgba(13, 110, 52, 1)";
 
     let wallet_ammount = await driver.findElement(By.id(balanceId)).getText();
-    if (is_win || lose === Number(process.env.MAX_LOSE_TIME) - 1) {
+    if (is_win) {
       lose = 0;
+      total_win++;
       start_lose_time = moment();
       amount = _.clone(base_amount);
-      console.log(`----Win, Amount: ${wallet_ammount}----`.green);
+      console.log(`---- Win, Amount: ${wallet_ammount} ----`.green);
     } else {
+      total_lose++;
       lose++;
-      if (lose == 5 && moment().diff(start_lose_time, "seconds") < 3) {
-        amount = _.clone(base_amount);
+      if (lose === Number(process.env.MAX_LOSE_TIME)) {
+        lose = 0;
+        total_reset++;
         start_lose_time = moment();
+        amount = _.clone(base_amount);
       } else {
-        amount = 2 * amount;
+        if (lose == 5 && moment().diff(start_lose_time, "seconds") < 3) {
+          amount = _.clone(base_amount);
+          start_lose_time = moment();
+        } else {
+          amount = 2 * amount;
+        }
       }
-      console.log(`----Lose(${lose} times), Amount: ${wallet_ammount}----`.red);
+
+      console.log(`---- Lose(${lose} times), Amount: ${wallet_ammount} ----`.red);
+      console.log(`---- Total Win: ${total_win}, Lose: ${total_lose}, Reset: ${total_reset} ----`);
     }
     // if (++time >= Number(process.env.MAX_ROUND)) {
     //   bit_high_value = !bit_high_value;
