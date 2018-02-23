@@ -18,8 +18,8 @@
     "nodemon": "^1.12.5"
   },
   "scripts": {
-    "start": "PORT=3000 ./node_modules/.bin/babel-node index.js",
-    "devstart": "nodemon ./node_modules/.bin/babel-node index.js",
+    "start": "./node_modules/.bin/babel index.js -o compiled.js && node compiled.js",
+    "devstart": "./node_modules/.bin/babel-node index.js",
     "dev": "./node_modules/.bin/babel-node index.js"
   },
   "author": "",
